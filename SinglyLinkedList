@@ -1,0 +1,228 @@
+package assign06;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class SinglyLinkedList<E> implements List<E> {
+
+	/**
+	 * Node class for this linked list.
+	 */
+	private static class Node<E> {
+		E value;
+		Node<E> next;
+
+		Node(E value) {
+			this.value = value;
+			this.next = null;
+		}
+	}
+
+	private Node<E> head;
+	private Node<E> tail;
+	private int size;
+
+	public SinglyLinkedList() {
+		head = null;
+		tail = null;
+		size = 0;
+	}
+
+	@Override
+	public void clear() {
+		head = null;
+		tail = null;
+		size = 0;
+	}
+
+	@Override
+	public E delete(int index) throws IndexOutOfBoundsException {
+		if (index < 0 || index >= size) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (index == 0) {
+			return deleteFirst();
+		}
+		// Deleting something that is not first index
+		Node<E> current = head;
+		for (int i = 0; i < index - 1; i++) { // Traverse through the linked list
+			current = current.next;
+		}
+		E dataOfIndex = current.next.value;
+		current.next = current.next.next; // change the pointer
+
+		if (current.next == null) {
+			tail = current;
+		}
+		size--;
+		return dataOfIndex;
+	}
+
+	@Override
+	public E deleteFirst() throws NoSuchElementException {
+		if (isEmpty()) {
+			throw new NoSuchElementException();
+		}
+		E valueOfHead = head.value;
+		head = head.next;
+
+		if (head == null) {
+			tail = null;
+		}
+		size--;
+		return valueOfHead;
+	}
+
+	@Override
+	public E get(int index) throws IndexOutOfBoundsException {
+		if (index < 0 || index >= size) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		Node<E> current = head;
+		for (int i = 0; i < index; i++) { // Iterate till reaching the index
+			current = current.next;
+		}
+		return current.value;
+	}
+
+	@Override
+	public E getFirst() throws NoSuchElementException {
+		if (head == null) {
+			throw new NoSuchElementException();
+		}
+		return head.value;
+	}
+
+	@Override
+	public E getLast() throws NoSuchElementException {
+		if (isEmpty()) {
+			throw new NoSuchElementException();
+		}
+		return tail.value;
+	}
+
+	@Override
+	public int indexOf(Object element) {
+		Node<E> current = head;
+		int index = 0;
+
+		while (current != null) {
+			if (element.equals(current.value)) {
+				return index;
+			}
+			current = current.next;
+			index++;
+		}
+		return -1;
+	}
+
+	@Override
+	public void insert(int index, Object element) throws IndexOutOfBoundsException {
+		if (index < 0 || index > size) {
+			throw new IndexOutOfBoundsException();
+		}
+		if (index == 0) {
+			insertFirst(element);
+			return;
+		}
+		Node<E> newNode = new Node(element);
+		Node<E> current = head;
+		for (int i = 0; i < index - 1; i++) {
+			current = current.next; // Iterate through linked list till reaching the index
+		}
+		newNode.next = current.next;
+		current.next = newNode;
+
+		if (newNode.next == null) {
+			tail = newNode;
+		}
+		size++;
+	}
+
+	@Override
+	public void insertFirst(Object element) {
+
+		Node<E> newNode = new Node(element);
+		newNode.next = head;
+		head = newNode;
+
+		if (tail == null) {
+			tail = head;
+		}
+		size++;
+	}
+
+	@Override
+	public void insertLast(Object element) {
+
+		Node<E> newNode = new Node(element);
+
+		if (isEmpty()) {
+			head = newNode;
+			tail = newNode;
+		} else {
+			tail.next = newNode;
+			tail = newNode;
+		}
+		size++;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		if (size == 0)
+			return true;
+		return false;
+	}
+
+	@Override
+	public int size() {
+		return size;
+	}
+
+	@Override
+	public Object[] toArray() {
+		Object[] array = new Object[size];
+		Node<E> current = head;
+		int index = 0;
+		while (current != null) {
+			array[index] = current.value;
+			index++;
+			current = current.next;
+		}
+		return array;
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public Iterator iterator() {
+		return new SinglyLinkedListPrivateIterator();
+	}
+
+	private class SinglyLinkedListPrivateIterator implements Iterator<E> {
+		private Node<E> current;
+
+		public SinglyLinkedListPrivateIterator() {
+			this.current = head;
+		}
+
+		public boolean hasNext() {
+			if (current != null) {
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public E next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException(); // We are looking at the tail
+			}
+			E value = current.value;
+			current = current.next;
+			return value;
+		}
+
+	}
+}
